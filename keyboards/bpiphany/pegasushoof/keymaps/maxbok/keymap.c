@@ -63,4 +63,17 @@ void keyboard_post_init_user(void) {
     ph_sclk_led_off();
 }
 
+uint32_t layer_state_set_user(uint32_t state) {
+    switch(biton32(state)) {
+        case 0:
+            ph_caps_led_off();
+            ph_sclk_led_off();
+            break;
+        case 1:
+            ph_caps_led_on();
+            ph_sclk_led_on();
+            break;
+    }
+    return state;
 }
+
