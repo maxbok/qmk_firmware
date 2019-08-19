@@ -41,16 +41,26 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   )
 };
 
-void led_set_user(uint8_t usb_led) {
-  if (usb_led & (1 << USB_LED_CAPS_LOCK)) {
-    ph_caps_led_on();
-  } else {
-    ph_caps_led_off();
-  }
+void keyboard_post_init_user(void) {
+    uint8_t time = 75;
 
-  if (usb_led & (1 << USB_LED_SCROLL_LOCK)) {
+    for (int i = 0; i < 2; i++) {
+        ph_caps_led_on();
+        wait_ms(time);
+        ph_caps_led_off();
+
+        ph_sclk_led_on();
+        wait_ms(time);
+        ph_sclk_led_off();
+    }
+
+    wait_ms(4 * time);
+
+    ph_caps_led_on();
     ph_sclk_led_on();
-  } else {
+    wait_ms(time);
+    ph_caps_led_off();
     ph_sclk_led_off();
-  }
+}
+
 }
