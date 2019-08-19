@@ -65,11 +65,11 @@ void keyboard_post_init_user(void) {
 
 uint32_t layer_state_set_user(uint32_t state) {
     switch(biton32(state)) {
-        case 0:
+        case KM_QWERTY:
             ph_caps_led_off();
             ph_sclk_led_off();
             break;
-        case 1:
+        case KM_MEDIA:
             ph_caps_led_on();
             ph_sclk_led_on();
             break;
