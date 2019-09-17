@@ -16,6 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include QMK_KEYBOARD_H
+#include "action_tapping.h"
 
 #define KM_QWERTY  0
 #define KM_UTILS   1
@@ -52,6 +53,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     XXXXXXX, XXXXXXX, XXXXXXX,                            XXXXXXX,                            XXXXXXX, XXXXXXX, XXXXXXX, _______,    XXXXXXX, XXXXXXX, XXXXXXX  \
   )
 };
+
+uint16_t get_tapping_term(uint16_t keycode) {
+    switch (keycode) {
+        case SLSH_LM:
+            return 130;
+        default:
+            return TAPPING_TERM;
+    }
+}
 
 void keyboard_post_init_user(void) {
     uint8_t time = 75;
