@@ -57,7 +57,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 uint16_t get_tapping_term(uint16_t keycode) {
     switch (keycode) {
         case SLSH_LM:
-            return 130;
+            return 150;
         default:
             return TAPPING_TERM;
     }
