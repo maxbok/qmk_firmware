@@ -15,6 +15,8 @@
  */
 #include QMK_KEYBOARD_H
 #include "action_tapping.h"
+#include "keyboards/wilba_tech/wt_rgb_backlight.h"
+#include "drivers/issi/is31fl3733.h"
 
 //This is the ANSI version of the PCB
 
@@ -45,6 +47,79 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     XXXXXXX,  XXXXXXX,  XXXXXXX,                                XXXXXXX,                                XXXXXXX,  XXXXXXX,  XXXXXXX, XXXXXXX  \
   ),
 };
+
+const uint8_t ledIndexes[DRIVER_LED_TOTAL] = {
+    0,        4,        8,        12,       16,       20,       24,       28,       32,       36,       40,       44,       48,      52,
+    1,        5,        9,        13,       17,       21,       25,       29,       33,       37,       41,       45,       49,      53,
+    2,        6,        10,       14,       18,       22,       26,       30,       34,       38,       42,       46,                54,
+    3,                  7,        11,       15,       19,       23,       27,       31,       35,       39,       43,                51,
+    56,       57,       58,                                     59,                                     61,       62,       63,      55
+};
+
+#define NAV 10
+#define M_NAV 20
+#define M_VOL 30
+#define BRIGHTN 40
+#define DANGER 50
+
+const uint8_t utilsColors[] = {
+    _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  M_VOL,    M_VOL,    _______,  _______,  _______, _______,
+    _______,  _______,  _______,  _______,  _______,  _______,  _______,  M_NAV,    M_NAV,    M_NAV,    _______,  _______,  _______, _______,
+    _______,  _______,  _______,  _______,  _______,  _______,  NAV,      NAV,      NAV,      NAV,      _______,  _______,           _______,
+    _______,            _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,           _______,
+    _______,  _______,  _______,                                _______,                                _______,  _______,  _______, _______
+};
+
+const uint8_t functionColors[] = {
+    _______,  BRIGHTN,  BRIGHTN,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______, _______,
+    _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  DANGER,  _______,
+    _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,           _______,
+    _______,            _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,           _______,
+    _______,  _______,  _______,                                _______,                                _______,  _______,  _______, _______
+};
+
+void keyboard_post_init_user(void) {
+}
+
+RGB colorAt(uint8_t index, const uint8_t colors[]) {
+    switch (colors[index]) {
+        case NAV:         return (RGB){ .r = 0,   .g = 255, .b = 0   };
+        case M_NAV:       return (RGB){ .r = 0,   .g = 255, .b = 255 };
+        case M_VOL:       return (RGB){ .r = 255, .g = 255, .b = 0   };
+        case BRIGHTN:     return (RGB){ .r = 0,   .g = 255, .b = 255 };
+        case DANGER:      return (RGB){ .r = 255, .g = 0,   .b = 0   };
+        case _______:     return (RGB){ .r = 0,   .g = 0,   .b = 0   };
+        default:          return (RGB){ .r = 0,   .g = 0,   .b = 0   };
+    }
+}
+
+uint32_t layer_state_set_user(uint32_t state) {
+    switch(biton32(state)) {
+        case 0:
+            backlight_timer_enable();
+            break;
+        case 1:
+            backlight_timer_disable();
+
+            for (uint8_t i = 0; i < DRIVER_LED_TOTAL; i++) {
+                RGB rgb = colorAt(i, utilsColors);
+                uint8_t index = ledIndexes[i];
+                IS31FL3733_set_color(index, rgb.r, rgb.g, rgb.b);
+            }
+            break;
+        case 2:
+            backlight_timer_disable();
+
+            for (uint8_t i = 0; i < DRIVER_LED_TOTAL; i++) {
+                RGB rgb = colorAt(i, functionColors);
+                uint8_t index = ledIndexes[i];
+                IS31FL3733_set_color(index, rgb.r, rgb.g, rgb.b);
+            }
+            break;
+    }
+
+    return state;
+}
 
 void matrix_init_user(void) {
   //user initialization
