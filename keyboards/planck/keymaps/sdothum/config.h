@@ -14,7 +14,7 @@
 // #define MOUSEKEY_WHEEL_DELAY 0
 
 // compile time macro string, see functions/hardware planck script (undefine otherwise)
-#define PRIVATE_STRING
+//#define PRIVATE_STRING
 
 // compile time macro string, must be in quotes
 #define PUBLIC_STRING ":%s/arch=(.*)/arch=('any')\n"
@@ -36,7 +36,6 @@
 #define HOME_MODS
 // fix dual function timing
 #define PERMISSIVE_HOLD
-#define IGNORE_MOD_TAP_INTERRUPT
 
 // layout ADNW*, BEAKL*, COLEKA*, QWERTY (default)
 #define BEAKLSP

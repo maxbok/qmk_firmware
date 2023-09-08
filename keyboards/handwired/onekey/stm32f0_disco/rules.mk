@@ -1,2 +1,1 @@
-# MCU name
-MCU = STM32F072
+
