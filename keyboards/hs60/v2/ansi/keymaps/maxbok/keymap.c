@@ -16,7 +16,7 @@
 #include QMK_KEYBOARD_H
 #include "action_tapping.h"
 #include "keyboards/wilba_tech/wt_rgb_backlight.h"
-#include "drivers/issi/is31fl3733.h"
+#include "drivers/led/issi/is31fl3733.h"
 
 //This is the ANSI version of the PCB
 
@@ -33,22 +33,22 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [1] = LAYOUT_60_ansi( /* Utils */
     KC_GRV,   XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  KC_VOLD,  KC_VOLU,  XXXXXXX,  XXXXXXX,  XXXXXXX, XXXXXXX, \
-    _______,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  KC_MPRV,  KC_MPLY,  KC_MNXT,  XXXXXXX,  XXXXXXX,  XXXXXXX, XXXXXXX, \
-    _______,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  KC_LEFT,  KC_DOWN,  KC_UP,    KC_RGHT,  XXXXXXX,  XXXXXXX,           _______, \
-    _______,            XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,           _______, \
+    _______,  XXXXXXX,  KC_7,     KC_8,     KC_9,     XXXXXXX,  XXXXXXX,  KC_MPRV,  KC_MPLY,  KC_MNXT,  XXXXXXX,  XXXXXXX,  XXXXXXX, XXXXXXX, \
+    _______,  XXXXXXX,  KC_4,     KC_5,     KC_6,     XXXXXXX,  KC_LEFT,  KC_DOWN,  KC_UP,    KC_RGHT,  XXXXXXX,  XXXXXXX,           _______, \
+    _______,            KC_0,     KC_1,     KC_2,     KC_3,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,           _______, \
     _______,  _______,  _______,                                XXXXXXX,                                _______,  _______,  _______, _______  \
   ),
 
   [2] = LAYOUT_60_ansi( /* Function */
     XXXXXXX,  KC_BRMD,  KC_BRMU,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX, KC_DEL , \
-    XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  RESET,   XXXXXXX, \
+    XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  QK_BOOT, XXXXXXX, \
     XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  S1_DEC,   S1_INC,   S2_DEC,   S2_INC,   XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,           XXXXXXX, \
     XXXXXXX,            EF_DEC,   EF_INC,   H1_DEC,   H1_INC,   H2_DEC,   H2_INC,   BR_DEC,   BR_INC,   ES_DEC,   ES_INC,            XXXXXXX, \
     XXXXXXX,  XXXXXXX,  XXXXXXX,                                XXXXXXX,                                XXXXXXX,  XXXXXXX,  XXXXXXX, XXXXXXX  \
   ),
 };
 
-const uint8_t ledIndexes[DRIVER_LED_TOTAL] = {
+const uint8_t ledIndexes[RGB_MATRIX_LED_COUNT] = {
     0,        4,        8,        12,       16,       20,       24,       28,       32,       36,       40,       44,       48,      52,
     1,        5,        9,        13,       17,       21,       25,       29,       33,       37,       41,       45,       49,      53,
     2,        6,        10,       14,       18,       22,       26,       30,       34,       38,       42,       46,                54,
@@ -59,22 +59,24 @@ const uint8_t ledIndexes[DRIVER_LED_TOTAL] = {
 #define NAV 10
 #define M_NAV 20
 #define M_VOL 30
-#define BRIGHTN 40
-#define DANGER 50
+#define KEYPAD 40
+#define BRIGHTN 100
+#define LED_ACT 110
+#define DANGER 120
 
 const uint8_t utilsColors[] = {
     _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  M_VOL,    M_VOL,    _______,  _______,  _______, _______,
-    _______,  _______,  _______,  _______,  _______,  _______,  _______,  M_NAV,    M_NAV,    M_NAV,    _______,  _______,  _______, _______,
-    _______,  _______,  _______,  _______,  _______,  _______,  NAV,      NAV,      NAV,      NAV,      _______,  _______,           _______,
-    _______,            _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,           _______,
+    _______,  _______,  KEYPAD,   KEYPAD,   KEYPAD,   _______,  _______,  M_NAV,    M_NAV,    M_NAV,    _______,  _______,  _______, _______,
+    _______,  _______,  KEYPAD,   KEYPAD,   KEYPAD,   _______,  NAV,      NAV,      NAV,      NAV,      _______,  _______,           _______,
+    _______,            KEYPAD,   KEYPAD,   KEYPAD,   KEYPAD,   _______,  _______,  _______,  _______,  _______,  _______,           _______,
     _______,  _______,  _______,                                _______,                                _______,  _______,  _______, _______
 };
 
 const uint8_t functionColors[] = {
     _______,  BRIGHTN,  BRIGHTN,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______, _______,
     _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  DANGER,  _______,
-    _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,           _______,
-    _______,            _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,           _______,
+    _______,  _______,  _______,  _______,  LED_ACT,  LED_ACT,  LED_ACT,  LED_ACT,  _______,  _______,  _______,  _______,           _______,
+    _______,            LED_ACT,  LED_ACT,  LED_ACT,  LED_ACT,  LED_ACT,  LED_ACT,  LED_ACT,  LED_ACT,  LED_ACT,  LED_ACT,           _______,
     _______,  _______,  _______,                                _______,                                _______,  _______,  _______, _______
 };
 
@@ -83,17 +85,19 @@ void keyboard_post_init_user(void) {
 
 RGB colorAt(uint8_t index, const uint8_t colors[]) {
     switch (colors[index]) {
-        case NAV:         return (RGB){ .r = 0,   .g = 255, .b = 0   };
-        case M_NAV:       return (RGB){ .r = 0,   .g = 255, .b = 255 };
-        case M_VOL:       return (RGB){ .r = 255, .g = 255, .b = 0   };
+        case NAV:         return (RGB){ .r = 137, .g = 207, .b = 240 };
+        case M_NAV:       return (RGB){ .r = 115, .g = 150, .b = 255 };
+        case M_VOL:       return (RGB){ .r = 0,   .g = 255, .b = 255 };
+        case KEYPAD:      return (RGB){ .r = 255, .g = 87,  .b = 51  };
         case BRIGHTN:     return (RGB){ .r = 0,   .g = 255, .b = 255 };
+        case LED_ACT:     return (RGB){ .r = 255, .g = 192, .b = 0   };
         case DANGER:      return (RGB){ .r = 255, .g = 0,   .b = 0   };
         case _______:     return (RGB){ .r = 0,   .g = 0,   .b = 0   };
         default:          return (RGB){ .r = 0,   .g = 0,   .b = 0   };
     }
 }
 
-uint32_t layer_state_set_user(uint32_t state) {
+layer_state_t layer_state_set_user(layer_state_t state) {
     switch(biton32(state)) {
         case 0:
             backlight_timer_enable();
@@ -101,19 +105,19 @@ uint32_t layer_state_set_user(uint32_t state) {
         case 1:
             backlight_timer_disable();
 
-            for (uint8_t i = 0; i < DRIVER_LED_TOTAL; i++) {
+            for (uint8_t i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
                 RGB rgb = colorAt(i, utilsColors);
                 uint8_t index = ledIndexes[i];
-                IS31FL3733_set_color(index, rgb.r, rgb.g, rgb.b);
+                is31fl3733_set_color(index, rgb.r, rgb.g, rgb.b);
             }
             break;
         case 2:
             backlight_timer_disable();
 
-            for (uint8_t i = 0; i < DRIVER_LED_TOTAL; i++) {
+            for (uint8_t i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
                 RGB rgb = colorAt(i, functionColors);
                 uint8_t index = ledIndexes[i];
-                IS31FL3733_set_color(index, rgb.r, rgb.g, rgb.b);
+                is31fl3733_set_color(index, rgb.r, rgb.g, rgb.b);
             }
             break;
     }
@@ -133,7 +137,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   return true;
 }
 
-uint16_t get_tapping_term(uint16_t keycode) {
+uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
     case SLSH_LM:
       return 150;
