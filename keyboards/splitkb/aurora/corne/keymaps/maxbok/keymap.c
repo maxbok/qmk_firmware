@@ -21,7 +21,8 @@
 
 enum layers {
     _QWERTY = 0,
-    _NUM_AND_NAV = 1
+    _NUM_AND_NAV = 1,
+    _UTILS = 2
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -29,35 +30,38 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_ESC,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                          KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_BSPC,
         CTL_TAB, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                          KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_ENT,
         KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                          KC_N,    KC_M,    KC_COMM, KC_DOT,  SLSH_LM, KC_RSFT,
-                                            KC_LALT, KC_LCMD, XXXXXXX,     KC_SPC,  KC_RCMD, KC_RALT
+                                            KC_LALT, KC_LCMD, MO(_UTILS),  KC_SPC,  KC_RCMD, KC_RALT
     ),
     [_NUM_AND_NAV] =  LAYOUT_split_3x6_3(
-        KC_GRV,  XXXXXXX, KC_P7,   KC_P8,   KC_P9,   XXXXXXX,                       KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_BSPC,
-        CTL_TAB, XXXXXXX, KC_P4,   KC_P5,   KC_P6,   XXXXXXX,                       KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_ENT,
-        KC_LSFT, KC_P0,   KC_P1,   KC_P2,   KC_P3,   XXXXXXX,                       KC_N,    KC_M,    KC_COMM, KC_DOT,  SLSH_LM, KC_RSFT,
+        KC_GRV,  XXXXXXX, KC_P7,   KC_P8,   KC_P9,   XXXXXXX,                       XXXXXXX, KC_MPRV, KC_MPLY, KC_MNXT, KC_VOLD, KC_VOLU,
+        _______, XXXXXXX, KC_P4,   KC_P5,   KC_P6,   XXXXXXX,                       KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, XXXXXXX, XXXXXXX,
+        _______, KC_P0,   KC_P1,   KC_P2,   KC_P3,   XXXXXXX,                       XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
                                             KC_LALT, KC_LCMD, XXXXXXX,     KC_SPC,  KC_RCMD, KC_RALT
     ),
+    [_UTILS] =  LAYOUT_split_3x6_3(
+        KC_TILD, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC,                       KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, _______,
+        _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                       XXXXXXX, XXXXXXX, XXXXXXX, KC_LBRC, KC_RBRC, KC_BSLS,
+        _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                       XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+                                            KC_LALT, KC_LCMD, _______,     KC_SPC,  KC_RCMD, KC_RALT
+    )
 };
 
 #ifdef RGBLIGHT_ENABLE
 void keyboard_post_init_user(void) {
   rgblight_enable_noeeprom(); // enables RGB, without saving settings
-  rgblight_sethsv_noeeprom(HSV_RED); // sets the color to red without saving
+  rgblight_sethsv_noeeprom(HSV_CYAN); // sets the color to red without saving
   rgblight_mode_noeeprom(RGBLIGHT_MODE_BREATHING + 3); // sets mode to Fast breathing without saving
 }
 #endif
 
 #ifdef OLED_ENABLE
 bool oled_task_user(void) {
-    // A 128x32 OLED rotated 90 degrees is 5 characters wide and 16 characters tall
-    // This example string should fill that neatly
-    const char *text = PSTR("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789!@#$%^&*()[]{}-=_+?");
-
     if (is_keyboard_master()) {
-        oled_write_P(text, false);
+        oled_write_P(PSTR("Left"), false);
     } else {
-        oled_write_P(text, false);
+        oled_write_P(PSTR("Right"), false);
     }
     return false;
 }
 #endif
+
