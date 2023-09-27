@@ -20,27 +20,50 @@
 
 //This is the ANSI version of the PCB
 
-#define SLSH_LM LT(1, KC_SLSH)
+#define SLSH_LM LT(_NAV, KC_SLSH)
 #define CTL_TAB CTL_T(KC_TAB)
+#define SPC_SYM LT(_SYMBOLS, KC_SPC)
+#define TG_TEST TG(_TEST)
+
+#define PRV_TAB SCMD(KC_LCBR)
+#define NXT_TAB SCMD(KC_RCBR)
+#define WEB_PRV LCMD(KC_LBRC)
+#define WEB_NXT LCMD(KC_RBRC)
+
+enum layers {
+    _QWERTY = 0,
+    _SYMBOLS = 1,
+    _NAV = 2,
+    _FUNCTION = 3,
+    _TEST = 4
+};
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-  [0] = LAYOUT_60_ansi( /* Base */
+  [_QWERTY] = LAYOUT_60_ansi(
     KC_ESC,   KC_1,     KC_2,     KC_3,     KC_4,     KC_5,     KC_6,     KC_7,     KC_8,     KC_9,     KC_0,     KC_MINS,  KC_EQL,   KC_BSPC, \
     KC_TAB,   KC_Q,     KC_W,     KC_E,     KC_R,     KC_T,     KC_Y,     KC_U,     KC_I,     KC_O,     KC_P,     KC_LBRC,  KC_RBRC,  KC_BSLS, \
     CTL_TAB,  KC_A,     KC_S,     KC_D,     KC_F,     KC_G,     KC_H,     KC_J,     KC_K,     KC_L,     KC_SCLN,  KC_QUOT,            KC_ENT,  \
     KC_LSFT,            KC_Z,     KC_X,     KC_C,     KC_V,     KC_B,     KC_N,     KC_M,     KC_COMM,  KC_DOT,   SLSH_LM,            KC_RSFT, \
-    KC_LCTL,  KC_LALT,  KC_LCMD,                                KC_SPC,                                 KC_RCMD,  KC_RALT,  TG(3),    MO(2)    \
+    KC_LCTL,  KC_LALT,  KC_LCMD,                                SPC_SYM,                                KC_RCMD,  KC_RALT,  TG_TEST ,MO(_FUNCTION) \
   ),
 
-  [1] = LAYOUT_60_ansi( /* Utils */
-    KC_GRV,   XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  KC_VOLD,  KC_VOLU,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX, \
-    _______,  XXXXXXX,  KC_7,     KC_8,     KC_9,     XXXXXXX,  XXXXXXX,  KC_MPRV,  KC_MPLY,  KC_MNXT,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX, \
-    _______,  XXXXXXX,  KC_4,     KC_5,     KC_6,     XXXXXXX,  KC_LEFT,  KC_DOWN,  KC_UP,    KC_RGHT,  XXXXXXX,  XXXXXXX,            _______, \
-    _______,            KC_0,     KC_1,     KC_2,     KC_3,     XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,            _______, \
+  [_SYMBOLS] = LAYOUT_60_ansi(
+    KC_GRV,   XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX, \
+    _______,  KC_EXLM,  KC_AT,    KC_HASH,  KC_DLR,   KC_PERC,  KC_CIRC,  KC_AMPR,  KC_ASTR,  KC_LPRN,  KC_RPRN,  XXXXXXX,  XXXXXXX,  XXXXXXX, \
+    _______,  KC_1,     KC_2,     KC_3,     KC_4,     KC_5,     KC_6,     KC_7,     KC_8,     KC_9,     KC_0,     XXXXXXX,            _______, \
+    _______,            XXXXXXX,  KC_SCLN,  KC_COLN,  KC_MINS,  KC_EQL,   KC_LCBR,  KC_LBRC,  KC_RBRC,  KC_RCBR,  XXXXXXX,            _______, \
     _______,  _______,  _______,                                XXXXXXX,                                _______,  _______,  _______,  _______  \
   ),
 
-  [2] = LAYOUT_60_ansi( /* Function */
+  [_NAV] = LAYOUT_60_ansi(
+    KC_GRV,   XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  KC_VOLD,  KC_VOLU,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX, \
+    _______,  KC_BRMD,  KC_BRMU,  XXXXXXX,  KC_VOLD,  KC_VOLU,  XXXXXXX,  KC_MPRV,  KC_MPLY,  KC_MNXT,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX, \
+    _______,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  KC_LEFT,  KC_DOWN,  KC_UP,    KC_RGHT,  XXXXXXX,  XXXXXXX,            _______, \
+    _______,            XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  WEB_PRV,  PRV_TAB,  NXT_TAB,  WEB_NXT,  XXXXXXX,            _______, \
+    _______,  _______,  _______,                                XXXXXXX,                                _______,  _______,  _______,  _______  \
+  ),
+
+  [_FUNCTION] = LAYOUT_60_ansi(
     XXXXXXX,  KC_BRMD,  KC_BRMU,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  KC_DEL,  \
     XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  QK_BOOT,  XXXXXXX, \
     XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  S1_DEC,   S1_INC,   S2_DEC,   S2_INC,   XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,            XXXXXXX, \
@@ -48,12 +71,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     XXXXXXX,  XXXXXXX,  XXXXXXX,                                XXXXXXX,                                XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX  \
   ),
 
-  [3] = LAYOUT_60_ansi( /* Test layer */
+  [_TEST] = LAYOUT_60_ansi(
     XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX, \
     XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX, \
     XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,            XXXXXXX, \
     XXXXXXX,            XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,            XXXXXXX, \
-    XXXXXXX,  XXXXXXX,  XXXXXXX,                                XXXXXXX,                                XXXXXXX,  XXXXXXX,  TG(3),    XXXXXXX  \
+    XXXXXXX,  XXXXXXX,  XXXXXXX,                                XXXXXXX,                                XXXXXXX,  XXXXXXX,  TG_TEST,  XXXXXXX  \
   ),
 };
 
@@ -70,24 +93,28 @@ const uint8_t ledIndexes[LED_MATRIX_COUNT] = {
 #define NAV 10
 #define M_NAV 20
 #define M_VOL 30
-#define KEYPAD 40
+#define NUM 40
+#define WEB 50
+#define TAB 60
 #define BRIGHTN 100
 #define LED_ACT 110
 #define DANGER 120
 
-#define WHITE   200
-#define RED     210
-#define ORANGE  220
-#define BLUE1   230
-#define BLUE2   231
-#define BLUE3   232
+#define WHITE    200
+#define RED      210
+#define ORANGE   220
+#define DARKORG  225
+#define BLUE1    230
+#define BLUE2    231
+#define BLUE3    232
 
-#define COLOR_WHITE     (RGB){ .r = 200, .g = 255, .b = 255 }
-#define COLOR_RED       (RGB){ .r = 255, .g = 0,   .b = 0   }
-#define COLOR_ORANGE    (RGB){ .r = 255, .g = 192, .b = 0   }
-#define COLOR_BLUE1     (RGB){ .r = 0,   .g = 0,   .b = 255 }
-#define COLOR_BLUE2     (RGB){ .r = 15,  .g = 72,  .b = 255 }
-#define COLOR_BLUE3     (RGB){ .r = 30,  .g = 144, .b = 255 }
+#define COLOR_WHITE         (RGB){ .r = 200, .g = 255, .b = 255 }
+#define COLOR_RED           (RGB){ .r = 255, .g = 0,   .b = 0   }
+#define COLOR_ORANGE        (RGB){ .r = 255, .g = 192, .b = 0   }
+#define COLOR_DARK_ORANGE   (RGB){ .r = 255, .g = 80,  .b = 0   }
+#define COLOR_BLUE1         (RGB){ .r = 0,   .g = 0,   .b = 255 }
+#define COLOR_BLUE2         (RGB){ .r = 15,  .g = 72,  .b = 255 }
+#define COLOR_BLUE3         (RGB){ .r = 30,  .g = 144, .b = 255 }
 
 const uint16_t initColors[] = {
     _______,  _______,  _______,  _______,  _______,  BLUE1,    BLUE1,    BLUE1,    BLUE1,    BLUE1,    BLUE1,    BLUE1,    BLUE1,    BLUE1,  
@@ -97,11 +124,19 @@ const uint16_t initColors[] = {
     _______,  _______,  RED,                                    RED,                                    RED,      RED,      RED,      RED
 };
 
-const uint16_t utilsColors[] = {
+const uint16_t symbolsColors[] = {
+    BLUE1,    _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,
+    _______,  BLUE2,    BLUE2,    BLUE2,    BLUE2,    BLUE2,    BLUE2,    BLUE2,    BLUE2,    BLUE2,    BLUE2,    _______,  _______,  _______,
+    _______,  BLUE3,    BLUE3,    BLUE3,    BLUE3,    BLUE3,    BLUE3,    BLUE3,    BLUE3,    BLUE3,    BLUE3,    _______,            _______,
+    _______,            _______,  DARKORG,  DARKORG,  DARKORG,  DARKORG,  ORANGE,   ORANGE,   ORANGE,   ORANGE,   _______,            _______,
+    _______,  _______,  _______,                                _______,                                _______,  _______,  _______,  _______
+};
+
+const uint16_t navColors[] = {
     _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  M_VOL,    M_VOL,    _______,  _______,  _______,  _______,
-    _______,  _______,  KEYPAD,   KEYPAD,   KEYPAD,   _______,  _______,  M_NAV,    M_NAV,    M_NAV,    _______,  _______,  _______,  _______,
-    _______,  _______,  KEYPAD,   KEYPAD,   KEYPAD,   _______,  NAV,      NAV,      NAV,      NAV,      _______,  _______,            _______,
-    _______,            KEYPAD,   KEYPAD,   KEYPAD,   KEYPAD,   _______,  _______,  _______,  _______,  _______,  _______,            _______,
+    _______,  BRIGHTN,  BRIGHTN,  _______,  M_VOL,    M_VOL,    _______,  M_NAV,    M_NAV,    M_NAV,    _______,  _______,  _______,  _______,
+    _______,  _______,  _______,  _______,  _______,  _______,  NAV,      NAV,      NAV,      NAV,      _______,  _______,            _______,
+    _______,            _______,  _______,  _______,  _______,  _______,  WEB,      TAB,      TAB,      WEB,      _______,            _______,
     _______,  _______,  _______,                                _______,                                _______,  _______,  _______,  _______
 };
 
@@ -121,7 +156,9 @@ RGB colorAt(uint8_t index, const uint16_t colors[]) {
         case NAV:         return COLOR_BLUE3;// (RGB){ .r = 137, .g = 207, .b = 240 };
         case M_NAV:       return COLOR_BLUE2;// (RGB){ .r = 115, .g = 150, .b = 255 };
         case M_VOL:       return COLOR_BLUE1;// (RGB){ .r = 0,   .g = 255, .b = 255 };
-        case KEYPAD:      return (RGB){ .r = 255, .g = 69,  .b = 0   };
+        case NUM:         return (RGB){ .r = 255, .g = 69,  .b = 0   };
+        case WEB:         return COLOR_ORANGE;
+        case TAB:         return COLOR_DARK_ORANGE;
         case BRIGHTN:     return (RGB){ .r = 0,   .g = 255, .b = 255 };
         case LED_ACT:     return (RGB){ .r = 255, .g = 192, .b = 0   };
         case DANGER:      return (RGB){ .r = 255, .g = 0,   .b = 0   };
@@ -130,6 +167,7 @@ RGB colorAt(uint8_t index, const uint16_t colors[]) {
         case WHITE:       return COLOR_WHITE;
         case RED:         return COLOR_RED;
         case ORANGE:      return COLOR_ORANGE;
+        case DARKORG:     return COLOR_DARK_ORANGE;
         case BLUE1:       return COLOR_BLUE1;
         case BLUE2:       return COLOR_BLUE2;
         case BLUE3:       return COLOR_BLUE3;
@@ -148,21 +186,26 @@ void set_led_matrix(const uint16_t colors[]) {
 
 layer_state_t layer_state_set_user(layer_state_t state) {
     switch(biton32(state)) {
-        case 0:
+        case _QWERTY:
             backlight_timer_enable();
             break;
 
-        case 1:
+        case _SYMBOLS:
             backlight_timer_disable();
-            set_led_matrix(utilsColors);
+            set_led_matrix(symbolsColors);
             break;
 
-        case 2:
+        case _NAV:
+            backlight_timer_disable();
+            set_led_matrix(navColors);
+            break;
+
+        case _FUNCTION:
             backlight_timer_disable();
             set_led_matrix(functionColors);
             break;
 
-        case 3:
+        case _TEST:
             backlight_timer_disable();
             set_led_matrix(initColors);
             break;
@@ -190,6 +233,8 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
             return 150;
         case CTL_TAB:
             return 140;
+        case SPC_SYM:
+            return 250;
         default:
             return TAPPING_TERM;
     }
