@@ -47,9 +47,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                             _______, _______, _______,          _______, _______, _______
     ),
     [_NAV] = LAYOUT_split_3x6_3(
-        KC_GRV,  KC_BRMD, KC_BRMU, XXXXXXX, KC_VOLD, KC_VOLU,                            XXXXXXX, KC_MPRV, KC_MPLY, KC_MNXT, XXXXXXX, XXXXXXX,
-        _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                            KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, XXXXXXX, XXXXXXX,
-        _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                            WEB_PRV, PRV_TAB, NXT_TAB, WEB_NXT, XXXXXXX, XXXXXXX,
+        KC_GRV,  KC_BRMD, KC_BRMU, KC_MS_U, KC_VOLD, KC_VOLU,                            XXXXXXX, KC_MPRV, KC_MPLY, KC_MNXT, XXXXXXX, XXXXXXX,
+        _______, XXXXXXX, KC_MS_L, KC_BTN1, KC_MS_R, XXXXXXX,                            KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, XXXXXXX, XXXXXXX,
+        _______, XXXXXXX, XXXXXXX, KC_MS_D, XXXXXXX, XXXXXXX,                            WEB_PRV, PRV_TAB, NXT_TAB, WEB_NXT, XXXXXXX, XXXXXXX,
                                             _______, _______, _______,          _______, _______, _______
     ),
 };
@@ -92,31 +92,67 @@ void suspend_wakeup_init_keymap(void) {
 #endif
 
 #ifdef OLED_ENABLE
-static void oled_render_layer_state(void) {
-    oled_write_P(PSTR("Layer: "), false);
-    switch (get_highest_layer(layer_state)) {
-        case _QWERTY:
-            oled_write_ln_P(PSTR("Base"), false);
-            break;
-        case _SYMBOLS:
-            oled_write_ln_P(PSTR("Symbols"), false);
-            break;
-        case _NAV:
-            oled_write_ln_P(PSTR("Navigation"), false);
-            break;
-        default:
-            oled_write_ln_P(PSTR("Oops"), false);
-            break;
-    }
-}
+// char *leftCharacters[][MATRIX_ROWS] = {
+//     [_QWERTY] = { "↖qwert", "^asdfg", "⇧zxcvb", "    ⌥⌘S" }
+// };
+// 
+// char *displayCharacters(char *charArray[MATRIX_ROWS]) {
+//     int length = 0;
+// 
+//     for (int i = 0; i < MATRIX_ROWS; i++) {
+//         length += strlen(charArray[i]);
+//     }
+// 
+//     char *string = malloc(sizeof(char) * length);
+// 
+//     for (int i = 0; i < MATRIX_ROWS; i++) {
+//         strcat(string, "\n");
+//         strcat(string, charArray[i]);
+//     } 
+// 
+//     return string;
+// }
+ 
+// static char rightCharacters[][MATRIX_ROWS][MATRIX_COLS] = {
+//     [_QWERTY] = {
+//         {"yuiop←"}, 
+//         {"hjkl'↩"},
+//         {"nm,./⇧"},
+//         {"␣⌘⌥"}
+//     }
+// };
+
+// static void oled_render_layer_state(void) {
+//     oled_write_P(PSTR("Layer: \n"), false);
+//     switch (get_highest_layer(layer_state)) {
+//         case _QWERTY:
+//             oled_write_ln_P(PSTR("Base"), false);
+//             break;
+//         case _SYMBOLS:
+//             oled_write_ln_P(PSTR("Symbols"), false);
+//             break;
+//         case _NAV:
+//             oled_write_ln_P(PSTR("Navigation"), false);
+//             break;
+//         default:
+//             oled_write_ln_P(PSTR("Oops"), false);
+//             break;
+//     }
+// }
+
 
 bool oled_task_user(void) {
     if (is_keyboard_master()) {
-        oled_render_layer_state();
-        return false;
+        //oled_render_layer_state();
+        // char *string = displayCharacters(leftCharacters[_QWERTY]);
+        // oled_write_P(PSTR(string), false);
+        // free(string);
+    } else {
+        // oled_write_P(PSTR("yuiopB\nhjkl'E\nnm,./S\nSCA"), false);
+        return true;
     }
 
-    return true;
+    return false;
 }
 #endif
 
