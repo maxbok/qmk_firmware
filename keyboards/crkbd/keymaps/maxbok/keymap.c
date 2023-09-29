@@ -22,11 +22,14 @@ enum layers {
     _QWERTY = 0,
     _SYMBOLS = 1,
     _NAV = 2,
+    _UTILS = 3
 };
 
 #define SLSH_LM LT(_NAV, KC_SLSH)
 #define CTL_TAB CTL_T(KC_TAB)
 #define SPC_SYM LT(_SYMBOLS, KC_SPC)
+#define TO_UTIL TG(_UTILS)//ACTION_TAP_DANCE_LAYER_TOGGLE(XXXXXXX, _UTILS)
+#define TG_UTIL TG(_UTILS)
 
 #define PRV_TAB SCMD(KC_LCBR)
 #define NXT_TAB SCMD(KC_RCBR)
@@ -43,7 +46,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_SYMBOLS] = LAYOUT_split_3x6_3(
         KC_GRV,  KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC,                            KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_DEL,
         _______, KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                               KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_BSLS,
-        _______, XXXXXXX, KC_SCLN, KC_COLN, KC_MINS, KC_EQL,                             KC_LCBR, KC_LBRC, KC_RBRC, KC_RCBR, XXXXXXX, _______,
+        _______, TO_UTIL, KC_SCLN, KC_COLN, KC_MINS, KC_EQL,                             KC_LCBR, KC_LBRC, KC_RBRC, KC_RCBR, XXXXXXX, _______,
                                             _______, _______, _______,          _______, _______, _______
     ),
     [_NAV] = LAYOUT_split_3x6_3(
@@ -52,15 +55,18 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______, XXXXXXX, XXXXXXX, KC_MS_D, XXXXXXX, XXXXXXX,                            WEB_PRV, PRV_TAB, NXT_TAB, WEB_NXT, XXXXXXX, XXXXXXX,
                                             _______, _______, _______,          _______, _______, _______
     ),
+    [_UTILS] = LAYOUT_split_3x6_3(
+        QK_BOOT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                            XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                            XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+        XXXXXXX, TG_UTIL, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                            XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+                                            XXXXXXX, XXXXXXX, XXXXXXX,          XXXXXXX, XXXXXXX, XXXXXXX
+    )
 };
 
 void keyboard_post_init_user(void) {
 #ifdef RGB_MATRIX_ENABLE
-    // rgblight_enable_noeeprom(); // enables RGB, without saving settings
-    // rgblight_mode_noeeprom(ENABLE_RGB_MATRIX_GRADIENT_UP_DOWN); // sets mode to Fast breathing without saving
-    // rgblight_sethsv_noeeprom(HSV_OFF);
-    eeconfig_update_rgb_matrix_default();
-    rgb_matrix_enable();
+    rgblight_enable_noeeprom();
+    rgblight_sethsv_noeeprom(HSV_OFF);
 #endif
 }
 
@@ -71,10 +77,16 @@ layer_state_t layer_state_set_user(layer_state_t state) {
             rgblight_sethsv_noeeprom(HSV_OFF);
             break;
         case _SYMBOLS:
-            rgblight_sethsv_noeeprom(HSV_ORANGE);
+            for (int i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
+                rgblight_sethsv_at(i * 255 / RGB_MATRIX_LED_COUNT, 255, 150, i);
+            }
             break;
         case _NAV:
-            rgblight_sethsv_noeeprom(HSV_TEAL);
+            rgblight_sethsv_range(HSV_TEAL, 6, 27);
+            break;
+        case _UTILS:
+            rgblight_setrgb_range(10, 10, 10, 6, 27);
+            rgblight_sethsv_at(HSV_RED, 24);
             break;
         default:
             break;
@@ -112,7 +124,7 @@ void suspend_wakeup_init_keymap(void) {
 // 
 //     return string;
 // }
- 
+//
 // static char rightCharacters[][MATRIX_ROWS][MATRIX_COLS] = {
 //     [_QWERTY] = {
 //         {"yuiop←"}, 
@@ -140,6 +152,9 @@ void suspend_wakeup_init_keymap(void) {
 //     }
 // }
 
+//oled_rotation_t oled_init_user(oled_rotation_t rotation) {
+//    return OLED_ROTATION_270;
+//}
 
 bool oled_task_user(void) {
     if (is_keyboard_master()) {
@@ -147,9 +162,10 @@ bool oled_task_user(void) {
         // char *string = displayCharacters(leftCharacters[_QWERTY]);
         // oled_write_P(PSTR(string), false);
         // free(string);
+
+        //oled_write_P(PSTR("↖qwert\n^asdfg\n⇧zxcvb\n    ⌥⌘S"), false);
     } else {
         // oled_write_P(PSTR("yuiopB\nhjkl'E\nnm,./S\nSCA"), false);
-        return true;
     }
 
     return false;
