@@ -16,19 +16,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include QMK_KEYBOARD_H
-
-enum layers {
-    _QWERTY = 0,
-    _SYMBOLS = 1,
-    _NAV = 2,
-    _UTILS = 3
-};
+#include "maxbok.h"
 
 #define SLSH_LM LT(_NAV, KC_SLSH)
 #define CTL_TAB CTL_T(KC_TAB)
 #define SPC_SYM LT(_SYMBOLS, KC_SPC)
-#define TO_UTIL TG(_UTILS)//ACTION_TAP_DANCE_LAYER_TOGGLE(XXXXXXX, _UTILS)
 #define TG_UTIL TG(_UTILS)
 
 #define PRV_TAB SCMD(KC_LCBR)
@@ -46,7 +38,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_SYMBOLS] = LAYOUT_split_3x6_3(
         KC_GRV,  KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC,                            KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_DEL,
         _______, KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                               KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_BSLS,
-        _______, TO_UTIL, KC_SCLN, KC_COLN, KC_MINS, KC_EQL,                             KC_LCBR, KC_LBRC, KC_RBRC, KC_RCBR, XXXXXXX, _______,
+        _______, TG_UTIL, KC_SCLN, KC_COLN, KC_MINS, KC_EQL,                             KC_LCBR, KC_LBRC, KC_RBRC, KC_RCBR, XXXXXXX, _______,
                                             _______, _______, _______,          _______, _______, _______
     ),
     [_NAV] = LAYOUT_split_3x6_3(
@@ -63,114 +55,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     )
 };
 
-void keyboard_post_init_user(void) {
+void eeconfig_init_user(void) {
 #ifdef RGB_MATRIX_ENABLE
-    rgblight_enable_noeeprom();
-    rgblight_sethsv_noeeprom(HSV_OFF);
+    rgb_matrix_enable_noeeprom();
 #endif
 }
-
-#ifdef RGB_MATRIX_ENABLE
-layer_state_t layer_state_set_user(layer_state_t state) {
-    switch (get_highest_layer(state)) {
-        case _QWERTY:
-            rgblight_sethsv_noeeprom(HSV_OFF);
-            break;
-        case _SYMBOLS:
-            for (int i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
-                rgblight_sethsv_at(i * 255 / RGB_MATRIX_LED_COUNT, 255, 150, i);
-            }
-            break;
-        case _NAV:
-            rgblight_sethsv_range(HSV_TEAL, 6, 27);
-            break;
-        case _UTILS:
-            rgblight_setrgb_range(10, 10, 10, 6, 27);
-            rgblight_sethsv_at(HSV_RED, 24);
-            break;
-        default:
-            break;
-    }
-    return state;
-}
-
-void suspend_power_down_keymap(void) {
-    rgb_matrix_set_suspend_state(true);
-}
-
-void suspend_wakeup_init_keymap(void) {
-    rgb_matrix_set_suspend_state(false);
-}
-#endif
-
-#ifdef OLED_ENABLE
-// char *leftCharacters[][MATRIX_ROWS] = {
-//     [_QWERTY] = { "↖qwert", "^asdfg", "⇧zxcvb", "    ⌥⌘S" }
-// };
-// 
-// char *displayCharacters(char *charArray[MATRIX_ROWS]) {
-//     int length = 0;
-// 
-//     for (int i = 0; i < MATRIX_ROWS; i++) {
-//         length += strlen(charArray[i]);
-//     }
-// 
-//     char *string = malloc(sizeof(char) * length);
-// 
-//     for (int i = 0; i < MATRIX_ROWS; i++) {
-//         strcat(string, "\n");
-//         strcat(string, charArray[i]);
-//     } 
-// 
-//     return string;
-// }
-//
-// static char rightCharacters[][MATRIX_ROWS][MATRIX_COLS] = {
-//     [_QWERTY] = {
-//         {"yuiop←"}, 
-//         {"hjkl'↩"},
-//         {"nm,./⇧"},
-//         {"␣⌘⌥"}
-//     }
-// };
-
-// static void oled_render_layer_state(void) {
-//     oled_write_P(PSTR("Layer: \n"), false);
-//     switch (get_highest_layer(layer_state)) {
-//         case _QWERTY:
-//             oled_write_ln_P(PSTR("Base"), false);
-//             break;
-//         case _SYMBOLS:
-//             oled_write_ln_P(PSTR("Symbols"), false);
-//             break;
-//         case _NAV:
-//             oled_write_ln_P(PSTR("Navigation"), false);
-//             break;
-//         default:
-//             oled_write_ln_P(PSTR("Oops"), false);
-//             break;
-//     }
-// }
-
-//oled_rotation_t oled_init_user(oled_rotation_t rotation) {
-//    return OLED_ROTATION_270;
-//}
-
-bool oled_task_user(void) {
-    if (is_keyboard_master()) {
-        //oled_render_layer_state();
-        // char *string = displayCharacters(leftCharacters[_QWERTY]);
-        // oled_write_P(PSTR(string), false);
-        // free(string);
-
-        //oled_write_P(PSTR("↖qwert\n^asdfg\n⇧zxcvb\n    ⌥⌘S"), false);
-    } else {
-        // oled_write_P(PSTR("yuiopB\nhjkl'E\nnm,./S\nSCA"), false);
-    }
-
-    return false;
-}
-#endif
 
 uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
