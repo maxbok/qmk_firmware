@@ -21,7 +21,9 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
                 rgb_matrix_set_color(i, 10, 10, 10);
             }
             rgb_matrix_set_color(24, RGB_RED);
+            rgb_matrix_set_color(21, RGB_GREEN);
             break;
+
         default:
             break;
     }
