@@ -16,7 +16,7 @@ typedef uint16_t COLOR_SYMBOL;
 
 #define COLOR_PURPLE        (RGB){ .r = 255, .g = 0,   .b = 255 }
 
-#define COLOR_LIGHT_BLUE    (RGB){ .r = 35, .g = 65, .b = 200 }
+#define COLOR_LIGHT_BLUE    (RGB){ .r = 35,  .g = 65,  .b = 200 }
 
 #define COLOR_GREEN         (RGB){ .r = 0  , .g = 255, .b = 0   }
 
@@ -40,9 +40,9 @@ const uint16_t color_symbols[4][MATRIX_ROWS][MATRIX_COLS] = {
                             ___, ___, ___,     ___, ___, ___
     ),
     [_UTILS] = LAYOUT_split_3x6_3(
-        QBT, ___, ___, ___, ___, ___,               ___, ___, ___, ___, ___, ___,
+        ___, ___, ___, ___, ___, QBT,               ___, ___, ___, ___, ___, ___,
         ___, ___, ___, ___, ___, ___,               ___, ___, ___, ___, ___, ___,
-        ___, BCK, ___, ___, ___, ___,               ___, ___, ___, ___, ___, ___,
+        ___, UTL, ___, ___, ___, ___,               ___, ___, ___, ___, ___, ___,
                             ___, ___, ___,     ___, ___, ___
     )
 };
