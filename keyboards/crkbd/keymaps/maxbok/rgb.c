@@ -5,6 +5,8 @@ typedef uint16_t COLOR_SYMBOL;
 #define ___ 0
 #define NUM 10
 #define SYM 20 // Symbol
+#define NAV 30
+#define MOU 40
 #define UTL 50 // To utils
 #define QBT 100 // Boot
 #define BCK 110 // Back to base
@@ -17,6 +19,7 @@ typedef uint16_t COLOR_SYMBOL;
 #define COLOR_PURPLE        (RGB){ .r = 255, .g = 0,   .b = 255 }
 
 #define COLOR_LIGHT_BLUE    (RGB){ .r = 35,  .g = 65,  .b = 200 }
+#define COLOR_BLUE          (RGB){ .r = 20,  .g = 30,  .b = 255 }
 
 #define COLOR_GREEN         (RGB){ .r = 0  , .g = 255, .b = 0   }
 
@@ -34,9 +37,9 @@ const uint16_t color_symbols[4][MATRIX_ROWS][MATRIX_COLS] = {
                             ___, ___, ___,     ___, ___, ___
     ),
     [_NAV] = LAYOUT_split_3x6_3(
-        ___, ___, ___, ___, ___, ___,               ___, ___, ___, ___, ___, ___,
-        ___, ___, ___, ___, ___, ___,               ___, ___, ___, ___, ___, ___,
-        ___, ___, ___, ___, ___, ___,               ___, ___, ___, ___, ___, ___,
+        ___, ___, ___, MOU, ___, ___,               ___, ___, ___, ___, ___, ___,
+        ___, ___, MOU, MOU, MOU, ___,               NAV, NAV, NAV, NAV, ___, ___,
+        ___, ___, ___, MOU, ___, ___,               ___, ___, ___, ___, ___, ___,
                             ___, ___, ___,     ___, ___, ___
     ),
     [_UTILS] = LAYOUT_split_3x6_3(
@@ -51,6 +54,8 @@ RGB symbol_to_rgb(COLOR_SYMBOL symbol) {
     switch (symbol) {
         case NUM:   return COLOR_DARK_ORANGE;
         case SYM:   return COLOR_LIGHT_BLUE;
+        case NAV:   return COLOR_BLUE;
+        case MOU:   return COLOR_BLUE;
         case UTL:   return COLOR_PURPLE;
         case QBT:   return COLOR_RED;
         case BCK:   return COLOR_GREEN;
