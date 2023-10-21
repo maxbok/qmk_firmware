@@ -25,11 +25,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* Select hand configuration */
 
 #define MASTER_LEFT
-// #define MASTER_RIGHT
-// #define EE_HANDS
 
 #define TAPPING_TERM 200
 #define TAPPING_TERM_PER_KEY
+
+#define SPLIT_LAYER_STATE_ENABLE
 
 #ifdef RGB_MATRIX_ENABLE
     // Disable unwanted R2G effects (from r2g/config.h)
