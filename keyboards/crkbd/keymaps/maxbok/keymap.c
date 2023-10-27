@@ -70,9 +70,9 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
         case CTL_TAB:
             return 140;
         case SFT_DEL:
-            return 140;
+            return 100;
         case SPC_SYM:
-            return 250;
+            return 200;
         default:
             return TAPPING_TERM;
     }
