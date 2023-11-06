@@ -1,58 +1,11 @@
+#include <stdio.h>
 #include "maxbok.h"
-
-// char *leftCharacters[][MATRIX_ROWS] = {
-//     [_QWERTY] = { "↖qwert", "^asdfg", "⇧zxcvb", "    ⌥⌘S" }
-// };
-// 
-// char *displayCharacters(char *charArray[MATRIX_ROWS]) {
-//     int length = 0;
-// 
-//     for (int i = 0; i < MATRIX_ROWS; i++) {
-//         length += strlen(charArray[i]);
-//     }
-// 
-//     char *string = malloc(sizeof(char) * length);
-// 
-//     for (int i = 0; i < MATRIX_ROWS; i++) {
-//         strcat(string, "\n");
-//         strcat(string, charArray[i]);
-//     } 
-// 
-//     return string;
-// }
-//
-// static char rightCharacters[][MATRIX_ROWS][MATRIX_COLS] = {
-//     [_QWERTY] = {
-//         {"yuiop←"}, 
-//         {"hjkl'↩"},
-//         {"nm,./⇧"},
-//         {"␣⌘⌥"}
-//     }
-// };
-
-// static void oled_render_layer_state(void) {
-//     oled_write_P(PSTR("Layer: \n"), false);
-//     switch (get_highest_layer(layer_state)) {
-//         case _QWERTY:
-//             oled_write_ln_P(PSTR("Base"), false);
-//             break;
-//         case _SYMBOLS:
-//             oled_write_ln_P(PSTR("Symbols"), false);
-//             break;
-//         case _NAV:
-//             oled_write_ln_P(PSTR("Navigation"), false);
-//             break;
-//         default:
-//             oled_write_ln_P(PSTR("Oops"), false);
-//             break;
-//     }
-// }
 
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
     if (is_keyboard_master()) {
         return OLED_ROTATION_270;
     } else {
-        return OLED_ROTATION_90;
+        return OLED_ROTATION_270;//OLED_ROTATION_90;
     }
 }
 
@@ -96,20 +49,85 @@ static void render_logo(void) {
     oled_write_raw_P(logo, sizeof(logo));
 }
 
+typedef struct report_t {
+    uint8_t type;
+    uint8_t size;
+    uint8_t data[30];
+} Report;
+
+char host_name[12];
+char time[5];
+char date[10];
+Report cpu_usage_report;
+
 bool oled_task_user(void) {
     if (is_keyboard_master()) {
-        //oled_render_layer_state();
-        // char *string = displayCharacters(leftCharacters[_QWERTY]);
-        // oled_write_P(PSTR(string), false);
-        // free(string);
+        oled_clear();
 
-        //oled_write_P(PSTR("Corne"), false);
+        oled_write_ln(host_name, false);
+        oled_write_ln(time, false);
+        oled_write_ln(date, false);
 
-        render_logo();
+        // for (int i = 0; i < cpu_usage_report.size; i++) {
+        //     oled_write_char((char)cpu_usage_report.data[i], false);
+        //     oled_write_char(' ', false);
+        // }
     } else {
-        // oled_write_P(PSTR("yuiopB\nhjkl'E\nnm,./S\nSCA"), false);
+        render_logo();
     }
 
     return false;
+}
+
+Report build_report(uint8_t *data, uint8_t length) {
+    Report report;
+
+    uint8_t type = data[0];
+    uint8_t size = data[1];
+
+    report.type = type;
+    report.size = size;
+
+    for (int i = 0; i < size; i++) {
+        report.data[i] = data[2 + i];
+    }
+
+    return report;
+}
+
+void host_name_from_report(Report report) {
+    memcpy(host_name, report.data, report.size);
+    host_name[report.size] = '\0';
+}
+
+void date_time_from_report(Report report) {
+    uint8_t hour = report.data[0];
+    uint8_t minute = report.data[1];
+    uint8_t day = report.data[2];
+    uint8_t month = report.data[3];
+
+    sprintf(time, "%02uh%02u", hour, minute);
+    sprintf(date, "%02u/%02u/2023", day, month);
+}
+
+void cpu_usage_from_report(Report report) {
+    cpu_usage_report = report;
+}
+
+void raw_hid_receive(uint8_t *data, uint8_t length) {
+    if (length > 2); else { return; }
+
+    Report report = build_report(data, length);
+
+    switch (report.type) {
+        case 0:
+            host_name_from_report(report);
+        case 1:
+            date_time_from_report(report);
+        case 2:
+            cpu_usage_from_report(report);
+        default:
+            break;
+    }
 }
 
