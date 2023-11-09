@@ -31,6 +31,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define SPLIT_LAYER_STATE_ENABLE
 
+#define SPLIT_TRANSACTION_IDS_USER SYNC_HOST_NAME, SYNC_DATE
+
 #ifdef RGB_MATRIX_ENABLE
     // Disable unwanted R2G effects (from r2g/config.h)
     #undef ENABLE_RGB_MATRIX_ALPHAS_MODS
