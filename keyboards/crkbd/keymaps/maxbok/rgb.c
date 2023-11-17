@@ -33,7 +33,7 @@ const uint16_t color_symbols[4][MATRIX_ROWS][MATRIX_COLS] = {
     [_SYMBOLS] = LAYOUT_split_3x6_3(
         ___, SYM, SYM, SYM, SYM, SYM,               SYM, SYM, SYM, SYM, SYM, ___,
         ___, NUM, NUM, NUM, NUM, NUM,               NUM, NUM, NUM, NUM, NUM, ___,
-        ___, UTL, SYM, SYM, SYM, SYM,               ___, ___, ___, ___, ___, ___,
+        ___, UTL, SYM, SYM, SYM, SYM,               ___, ___, ___, ___, UTL, ___,
                             ___, ___, ___,     ___, ___, ___
     ),
     [_NAV] = LAYOUT_split_3x6_3(
@@ -43,9 +43,9 @@ const uint16_t color_symbols[4][MATRIX_ROWS][MATRIX_COLS] = {
                             ___, ___, ___,     ___, ___, ___
     ),
     [_UTILS] = LAYOUT_split_3x6_3(
-        ___, ___, ___, ___, ___, QBT,               ___, ___, ___, ___, ___, ___,
+        ___, ___, ___, ___, ___, QBT,               QBT, ___, ___, ___, ___, ___,
         ___, ___, ___, ___, ___, ___,               ___, ___, ___, ___, ___, ___,
-        ___, UTL, ___, ___, ___, ___,               ___, ___, ___, ___, ___, ___,
+        ___, UTL, ___, ___, ___, ___,               ___, ___, ___, ___, UTL, ___,
                             ___, ___, ___,     ___, ___, ___
     )
 };
