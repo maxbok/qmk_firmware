@@ -22,14 +22,19 @@ typedef struct Time {
     bool changed;
 } Time;
 
-bool is_locked;
+typedef struct Lock {
+    bool value;
+    bool changed;
+} Lock;
+
+Lock is_locked;
 Label host_name;
 Time time;
 Label date;
 // Report cpu_usage_report;
 
 void reset_states(void) {
-    is_locked = false;
+    is_locked = (Lock) { false, false };
     host_name = (Label) { "", 0, false };
     time = (Time) { 0, 0, false };
     date = (Label) { "", 11, false };
@@ -72,11 +77,13 @@ void sync_date(uint8_t in_buflen, const void* in_data, uint8_t out_buflen, void*
 }
 
 void sync_is_locked(uint8_t in_buflen, const void* in_data, uint8_t out_buflen, void* out_data) {
-    const bool *received_is_locked = (const bool *)in_data;
+    const Lock *received_is_locked = (const Lock *)in_data;
 
-    if (*received_is_locked == true) {
-        reset_states();
-    }
+    if (is_locked.value != received_is_locked->value);
+    else { return; }
+
+    is_locked.value = received_is_locked->value;
+    is_locked.changed = true;
 }
 
 void keyboard_post_init_user(void) {
@@ -117,11 +124,13 @@ void housekeeping_sync_is_locked(void) {
     // Interact with slave every 1s
     static uint32_t last_is_locked_sync = 0;
     if (
+            is_locked.changed &&
             timer_elapsed32(last_is_locked_sync) > 1000 &&
             transaction_rpc_send(SYNC_IS_LOCKED, sizeof(is_locked), &is_locked)
        );
     else { return; }
         
+    is_locked.changed = false;
     last_is_locked_sync = timer_read32();
 }
 
@@ -185,7 +194,7 @@ void oled_render_time_component(uint8_t component, uint8_t y_index) {
 }
 
 void render_master(void) {
-    if (is_locked) {
+    if (is_locked.value) {
         oled_clear();
         return;
     }
@@ -199,6 +208,11 @@ void render_master(void) {
 }
 
 void render_slave(void) {
+    if (is_locked.value) {
+        oled_clear();
+        return;
+    }
+
     if (host_name.changed || date.changed);
     else { return; }
 
@@ -247,15 +261,16 @@ void host_name_from_report(Report report) {
 void date_time_from_report(Report report) {
     uint8_t hour = report.data[0];
     uint8_t minute = report.data[1];
-    uint8_t day = report.data[2];
-    uint8_t month = report.data[3];
-    uint8_t year1 = report.data[4];
-    uint8_t year2 = report.data[5];
-    uint16_t year = ((uint16_t)year2 << 8) | year1;
 
     time.hour = hour;
     time.minute = minute;
     time.changed = true;
+
+    uint8_t day = report.data[2];
+    uint8_t month = report.data[3];
+    uint8_t year1 = report.data[4];
+    uint16_t year2 = report.data[5] * 256;
+    uint16_t year = year2 + year1;
 
     sprintf(date.value, "%02u/%02u/%04u", day, month, year);
     date.value[10] = '\0';
@@ -266,6 +281,19 @@ void cpu_usage_from_report(Report report) {
     // cpu_usage_report = report;
 }
 
+void unlock(void) {
+    if (is_locked.value); else { return; }
+    
+    is_locked.value = false;
+    is_locked.changed = true;
+}
+
+void lock(void) {
+    reset_states();
+    is_locked.value = true;
+    is_locked.changed = true;
+}
+
 // Receive raw hid
 
 void raw_hid_receive(uint8_t *data, uint8_t length) {
@@ -273,11 +301,10 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
 
     Report report = build_report(data, length);
 
-    is_locked = false;
+    unlock();
     switch (report.type) {
         case 0:
-            reset_states();
-            is_locked = true;
+            lock();
             break;
         case 1:
             host_name_from_report(report);
