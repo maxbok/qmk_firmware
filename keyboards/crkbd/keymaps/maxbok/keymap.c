@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "maxbok.h"
+#include "tap_dance.h"
 
 #define SLSH_LM LT(_NAV, KC_SLSH)
 #define CTL_TAB CTL_T(KC_TAB)
