@@ -148,10 +148,13 @@ void oled_render_digit(const char *digit, uint8_t x_offset, uint8_t y_offset, ui
 }
 
 void oled_render_large_digit(const char *digit, uint8_t x_index, uint8_t y_index) {
+    uint8_t horizontal_margin = 2;
+    uint8_t vertical_margin = 4;
+
     oled_render_digit(
             digit, 
-            x_index * LARGE_ASSET_WIDTH, 
-            y_index * LARGE_ASSET_HEIGHT,
+            x_index * (LARGE_ASSET_WIDTH + horizontal_margin),
+            y_index * (LARGE_ASSET_HEIGHT + vertical_margin),
             LARGE_ASSET_WIDTH, 
             LARGE_ASSET_HEIGHT
     );
