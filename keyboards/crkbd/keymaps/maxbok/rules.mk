@@ -8,6 +8,6 @@ ifeq ($(strip $(RGB_MATRIX_ENABLE)), yes)
 endif
 
 ifeq ($(strip $(OLED_ENABLE)), yes)
-	SRC+= oled.c
+	SRC += oled.c
 endif
 

@@ -63,9 +63,18 @@ void sync_date(uint8_t in_buflen, const void* in_data, uint8_t out_buflen, void*
     date.changed = true;
 }
 
+void sync_is_locked(uint8_t in_buflen, const void* in_data, uint8_t out_buflen, void* out_data) {
+    const bool *received_is_locked = (const bool *)in_data;
+
+    if (*received_is_locked == true) {
+        reset_states();
+    }
+}
+
 void keyboard_post_init_user(void) {
     transaction_register_rpc(SYNC_HOST_NAME, sync_host_name);
     transaction_register_rpc(SYNC_DATE, sync_date);
+    transaction_register_rpc(SYNC_IS_LOCKED, sync_is_locked);
 }
 
 void housekeeping_sync_host_name(void) {
@@ -96,12 +105,25 @@ void housekeeping_sync_date(void) {
     last_date_sync = timer_read32();
 }
 
+void housekeeping_sync_is_locked(void) {
+    // Interact with slave every 1s
+    static uint32_t last_is_locked_sync = 0;
+    if (
+            timer_elapsed32(last_is_locked_sync) > 1000 &&
+            transaction_rpc_send(SYNC_IS_LOCKED, sizeof(is_locked), &is_locked)
+       );
+    else { return; }
+        
+    last_is_locked_sync = timer_read32();
+}
+
 void housekeeping_task_user(void) {
     if (is_keyboard_master());
     else { return; }
 
     housekeeping_sync_host_name();
     housekeeping_sync_date();
+    housekeeping_sync_is_locked();
 }
 
 // Render
