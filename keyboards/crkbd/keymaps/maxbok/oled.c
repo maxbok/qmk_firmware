@@ -1,6 +1,8 @@
 #include <stdio.h>
+#include <math.h>
 #include "transactions.h"
 #include "maxbok.h"
+#include "oled_assets.h"
 
 typedef struct Report {
     uint8_t type;
@@ -14,16 +16,22 @@ typedef struct Label {
     bool changed;
 } Label;
 
+typedef struct Time {
+    uint8_t hour;
+    uint8_t minute;
+    bool changed;
+} Time;
+
 bool is_locked;
 Label host_name;
-Label time;
+Time time;
 Label date;
 // Report cpu_usage_report;
 
 void reset_states(void) {
     is_locked = false;
     host_name = (Label) { "", 0, false };
-    time = (Label) { "", 6, false };
+    time = (Time) { 0, 0, false };
     date = (Label) { "", 11, false };
 }
 
@@ -128,6 +136,51 @@ void housekeeping_task_user(void) {
 
 // Render
 
+void oled_render_digit(const char *digit, uint8_t x_offset, uint8_t y_offset, uint8_t width, uint8_t height) {
+     for (uint8_t x = 0; x < width; x++) {
+         for (uint8_t y = 0; y < ceil(height / 8); y++) {
+             uint8_t index = x + (y * width);
+             for (uint8_t bit = 0; bit < 8; bit++) {
+                 oled_write_pixel(x_offset + x, y_offset + y * 8 + bit, digit[index] & (1 << bit));
+             }
+         }
+     }
+}
+
+void oled_render_large_digit(const char *digit, uint8_t x_index, uint8_t y_index) {
+    oled_render_digit(
+            digit, 
+            x_index * LARGE_ASSET_WIDTH, 
+            y_index * LARGE_ASSET_HEIGHT,
+            LARGE_ASSET_WIDTH, 
+            LARGE_ASSET_HEIGHT
+    );
+}
+
+const char *digit_large_asset(uint8_t value) {
+    switch (value) {
+        case 0:     return large0;
+        case 1:     return large1;
+        case 2:     return large2;
+        case 3:     return large3;
+        case 4:     return large4;
+        case 5:     return large5;
+        case 6:     return large6;
+        case 7:     return large7;
+        case 8:     return large8;
+        case 9:     return large9;
+        default:    return large0;
+    }
+}
+
+void oled_render_time_component(uint8_t component, uint8_t y_index) {
+    uint8_t tens = floor(component / 10);
+    uint8_t units = component - tens * 10;
+
+    oled_render_large_digit(digit_large_asset(tens), 0, y_index);
+    oled_render_large_digit(digit_large_asset(units), 1, y_index);
+}
+
 void render_master(void) {
     if (is_locked) {
         oled_clear();
@@ -137,7 +190,8 @@ void render_master(void) {
     if (time.changed);
     else { return; }
 
-    oled_write_ln(time.value, false);
+    oled_render_time_component(time.hour, 0);
+    oled_render_time_component(time.minute, 1);
     time.changed = false;
 }
 
@@ -196,8 +250,8 @@ void date_time_from_report(Report report) {
     uint8_t year2 = report.data[5];
     uint16_t year = ((uint16_t)year2 << 8) | year1;
 
-    sprintf(time.value, "%02uh%02u", hour, minute);
-    time.value[5] = '\0';
+    time.hour = hour;
+    time.minute = minute;
     time.changed = true;
 
     sprintf(date.value, "%02u/%02u/%04u", day, month, year);
