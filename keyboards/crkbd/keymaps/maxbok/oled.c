@@ -22,6 +22,13 @@ typedef struct Time {
     bool changed;
 } Time;
 
+typedef struct Date {
+    uint8_t day;
+    uint8_t month;
+    uint16_t year;
+    bool changed;
+} Date;
+
 typedef struct Lock {
     bool value;
     bool changed;
@@ -30,14 +37,14 @@ typedef struct Lock {
 Lock is_locked;
 Label host_name;
 Time time;
-Label date;
+Date date;
 // Report cpu_usage_report;
 
 void reset_states(void) {
     is_locked = (Lock) { false, false };
     host_name = (Label) { "", 0, false };
     time = (Time) { 0, 0, false };
-    date = (Label) { "", 11, false };
+    date = (Date) { 0, 0, 0, false };
 }
 
 // Orientation
@@ -66,13 +73,14 @@ void sync_host_name(uint8_t in_buflen, const void* in_data, uint8_t out_buflen, 
 }
 
 void sync_date(uint8_t in_buflen, const void* in_data, uint8_t out_buflen, void* out_data) {
-    const Label *received_date = (const Label *)in_data;
+    const Date *received_date = (const Date *)in_data;
 
-    if (date.value != received_date->value);
+    if (date.day != received_date->day || date.month != received_date->month || date.year != received_date->year);
     else { return; }
 
-    memcpy(date.value, received_date->value, received_date->length);
-    date.value[received_date->length] = '\0';
+    date.day = received_date->day;
+    date.month = received_date->month;
+    date.year = received_date->year;
     date.changed = true;
 }
 
@@ -145,28 +153,46 @@ void housekeeping_task_user(void) {
 
 // Render
 
-void oled_render_digit(const char *digit, uint8_t x_offset, uint8_t y_offset, uint8_t width, uint8_t height) {
-     for (uint8_t x = 0; x < width; x++) {
-         for (uint8_t y = 0; y < ceil(height / 8); y++) {
-             uint8_t index = x + (y * width);
+typedef struct CharacterSize {
+    uint8_t horizontal_margin;
+    uint8_t vertical_margin;
+    uint8_t width;
+    uint8_t height;
+} CharacterSize;
+
+CharacterSize largeCharacterSize = (CharacterSize) { 2, 4, LARGE_ASSET_WIDTH, LARGE_ASSET_HEIGHT };
+CharacterSize smallCharacterSize = (CharacterSize) { 1, 2, SMALL_ASSET_WIDTH, SMALL_ASSET_HEIGHT };
+
+void oled_render_character(const char *character, uint8_t x_index, uint8_t y_index, CharacterSize size) {
+    uint8_t x_offset = x_index * (size.width + size.horizontal_margin);
+    uint8_t y_offset = y_index * (size.height + size.vertical_margin);
+        
+     for (uint8_t x = 0; x < size.width; x++) {
+         for (uint8_t y = 0; y < ceil((float)size.height / 8); y++) {
+             uint8_t index = x + (y * size.width);
              for (uint8_t bit = 0; bit < 8; bit++) {
-                 oled_write_pixel(x_offset + x, y_offset + y * 8 + bit, digit[index] & (1 << bit));
+                if (index < size.width * size.height) {
+                    oled_write_pixel(x_offset + x, y_offset + y * 8 + bit, character[index] & (1 << bit));
+                }
              }
          }
      }
 }
 
-void oled_render_large_digit(const char *digit, uint8_t x_index, uint8_t y_index) {
-    uint8_t horizontal_margin = 2;
-    uint8_t vertical_margin = 4;
-
-    oled_render_digit(
-            digit, 
-            x_index * (LARGE_ASSET_WIDTH + horizontal_margin),
-            y_index * (LARGE_ASSET_HEIGHT + vertical_margin),
-            LARGE_ASSET_WIDTH, 
-            LARGE_ASSET_HEIGHT
-    );
+const char *digit_small_asset(uint8_t value) {
+    switch (value) {
+        case 0:     return small0;
+        case 1:     return small1;
+        case 2:     return small2;
+        case 3:     return small3;
+        case 4:     return small4;
+        case 5:     return small5;
+        case 6:     return small6;
+        case 7:     return small7;
+        case 8:     return small8;
+        case 9:     return small9;
+        default:    return NULL;
+    }
 }
 
 const char *digit_large_asset(uint8_t value) {
@@ -181,7 +207,33 @@ const char *digit_large_asset(uint8_t value) {
         case 7:     return large7;
         case 8:     return large8;
         case 9:     return large9;
-        default:    return large0;
+        default:    return NULL;
+    }
+}
+
+void oled_render_number(uint16_t number, uint8_t x_index, uint8_t y_index, uint8_t count, CharacterSize size) {
+    uint8_t thousands = floor(number / 1000);
+    number -= thousands * 1000;
+    uint8_t hundreds = floor(number / 100);
+    number -= hundreds * 100;
+    uint8_t tens = floor(number / 10);
+    number -= tens * 10;
+    uint8_t units = number;
+
+    if (count >= 4) {
+        oled_render_character(digit_small_asset(thousands), x_index, y_index, size);
+        x_index++;
+    }
+    if (count >= 3) {
+        oled_render_character(digit_small_asset(hundreds), x_index, y_index, size);
+        x_index++;
+    }
+    if (count >= 2) {
+        oled_render_character(digit_small_asset(tens), x_index, y_index, size);
+        x_index++;
+    }
+    if (count >= 1) {
+        oled_render_character(digit_small_asset(units), x_index, y_index, size);
     }
 }
 
@@ -189,8 +241,16 @@ void oled_render_time_component(uint8_t component, uint8_t y_index) {
     uint8_t tens = floor(component / 10);
     uint8_t units = component - tens * 10;
 
-    oled_render_large_digit(digit_large_asset(tens), 0, y_index);
-    oled_render_large_digit(digit_large_asset(units), 1, y_index);
+    oled_render_character(digit_large_asset(tens), 0, y_index, largeCharacterSize);
+    oled_render_character(digit_large_asset(units), 1, y_index, largeCharacterSize);
+}
+
+void oled_render_date(uint8_t day, uint8_t month, uint16_t year) {
+    oled_render_number(day, 0, 1, 2, smallCharacterSize);
+    oled_render_character(smallslash, 2, 1, smallCharacterSize);
+    oled_render_number(month, 3, 1, 2, smallCharacterSize);
+    oled_render_character(smallslash, 5, 1, smallCharacterSize);
+    oled_render_number(year, 6, 1, 4, smallCharacterSize);
 }
 
 void render_master(void) {
@@ -217,7 +277,7 @@ void render_slave(void) {
     else { return; }
 
     oled_write_ln(host_name.value, false);
-    oled_write_ln(date.value, false);
+    oled_render_date(date.day, date.month, date.year);
 
     host_name.changed = false;
     date.changed = false;
@@ -259,21 +319,13 @@ void host_name_from_report(Report report) {
 }
 
 void date_time_from_report(Report report) {
-    uint8_t hour = report.data[0];
-    uint8_t minute = report.data[1];
-
-    time.hour = hour;
-    time.minute = minute;
+    time.hour = report.data[0];
+    time.minute = report.data[1];
     time.changed = true;
 
-    uint8_t day = report.data[2];
-    uint8_t month = report.data[3];
-    uint8_t year1 = report.data[4];
-    uint16_t year2 = report.data[5] * 256;
-    uint16_t year = year2 + year1;
-
-    sprintf(date.value, "%02u/%02u/%04u", day, month, year);
-    date.value[10] = '\0';
+    date.day = report.data[2];
+    date.month = report.data[3];
+    date.year = report.data[5] << 8 | report.data[4]; 
     date.changed = true;
 }
 
