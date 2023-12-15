@@ -34,17 +34,24 @@ typedef struct Lock {
     bool changed;
 } Lock;
 
+typedef struct CPUUsage {
+    uint8_t cores[20];
+    uint8_t count;
+    bool changed;
+} CPUUsage;
+
 Lock is_locked;
 Label host_name;
 Time time;
 Date date;
-// Report cpu_usage_report;
+CPUUsage cpu_usage;
 
 void reset_states(void) {
     is_locked = (Lock) { false, false };
     host_name = (Label) { "", 0, false };
     time = (Time) { 0, 0, false };
     date = (Date) { 0, 0, 0, false };
+    cpu_usage = (CPUUsage) { {}, 0, false };
 }
 
 // Orientation
@@ -253,18 +260,46 @@ void oled_render_date(uint8_t day, uint8_t month, uint16_t year) {
     oled_render_number(year, 6, 1, 4, smallCharacterSize);
 }
 
+static uint8_t cpu_y_offset = 48;
+static uint8_t cpu_height = 78; // 128 - cpu_y_offset;
+static uint8_t cpu_width = 32;
+
+void oled_render_core_usage(uint8_t usage, uint8_t index) {
+    uint8_t margin = 1;
+    uint8_t core_height = floor(cpu_height / (cpu_usage.count + margin));
+    uint8_t core_width = round(usage * cpu_width / 100);
+
+    uint8_t y_offset = cpu_y_offset + index * (core_height + margin);
+
+    for (uint8_t i = 0; i < core_height; i++) {
+        for (uint8_t j = 0; j < cpu_width; j++) {
+            oled_write_pixel(j, i + y_offset, j < core_width);
+        }
+    }
+}
+
+void oled_render_cpu_usage(void) {
+    for (uint8_t i = 0; i < cpu_usage.count; i++) {
+        oled_render_core_usage(cpu_usage.cores[i], i);
+    }
+}
+
 void render_master(void) {
     if (is_locked.value) {
         oled_clear();
         return;
     }
 
-    if (time.changed);
-    else { return; }
+    if (time.changed) {
+        oled_render_time_component(time.hour, 0);
+        oled_render_time_component(time.minute, 1);
+        time.changed = false;
+    }
 
-    oled_render_time_component(time.hour, 0);
-    oled_render_time_component(time.minute, 1);
-    time.changed = false;
+    if (cpu_usage.changed) {
+        oled_render_cpu_usage();
+        cpu_usage.changed = false;
+    }
 }
 
 void render_slave(void) {
@@ -273,14 +308,15 @@ void render_slave(void) {
         return;
     }
 
-    if (host_name.changed || date.changed);
-    else { return; }
+    if (host_name.changed) {
+        oled_write_ln(host_name.value, false);
+        host_name.changed = false;
+    }
 
-    oled_write_ln(host_name.value, false);
-    oled_render_date(date.day, date.month, date.year);
-
-    host_name.changed = false;
-    date.changed = false;
+    if (date.changed) {
+        oled_render_date(date.day, date.month, date.year);
+        date.changed = false;
+    }
 }
 
 bool oled_task_user(void) {
@@ -304,7 +340,7 @@ Report build_report(uint8_t *data, uint8_t length) {
     report.type = type;
     report.size = size;
 
-    for (int i = 0; i < size; i++) {
+    for (uint8_t i = 0; i < size; i++) {
         report.data[i] = data[2 + i];
     }
 
@@ -330,7 +366,13 @@ void date_time_from_report(Report report) {
 }
 
 void cpu_usage_from_report(Report report) {
-    // cpu_usage_report = report;
+    cpu_usage.count = report.size;
+
+    for (uint8_t i = 0; i < cpu_usage.count; i++) {
+        cpu_usage.cores[i] = report.data[i];
+    }
+
+    cpu_usage.changed = true;
 }
 
 void unlock(void) {
