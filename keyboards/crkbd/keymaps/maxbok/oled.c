@@ -108,7 +108,7 @@ void keyboard_post_init_user(void) {
 }
 
 void housekeeping_sync_host_name(void) {
-    // Interact with slave every 1s
+    // Interact with peripheral every 1s
     static uint32_t last_host_name_sync = 0;
     if (
             host_name.changed && 
@@ -122,7 +122,7 @@ void housekeeping_sync_host_name(void) {
 }
 
 void housekeeping_sync_date(void) {
-    // Interact with slave every 1s
+    // Interact with peripheral every 1s
     static uint32_t last_date_sync = 0;
     if (
             date.changed && 
@@ -136,7 +136,7 @@ void housekeeping_sync_date(void) {
 }
 
 void housekeeping_sync_is_locked(void) {
-    // Interact with slave every 1s
+    // Interact with peripheral every 1s
     static uint32_t last_is_locked_sync = 0;
     if (
             is_locked.changed &&
@@ -284,9 +284,11 @@ void oled_render_cpu_usage(void) {
     }
 }
 
-void render_master(void) {
+void render_central(void) {
     if (is_locked.value) {
         oled_clear();
+        time.changed = true;
+        cpu_usage.changed = true;
         return;
     }
 
@@ -302,9 +304,11 @@ void render_master(void) {
     }
 }
 
-void render_slave(void) {
+void render_peripheral(void) {
     if (is_locked.value) {
         oled_clear();
+        host_name.changed = true;
+        date.changed = true;
         return;
     }
 
@@ -321,9 +325,9 @@ void render_slave(void) {
 
 bool oled_task_user(void) {
     if (is_keyboard_master()) {
-        render_master();
+        render_central();
     } else {
-        render_slave();
+        render_peripheral();
     }
 
     return false;
