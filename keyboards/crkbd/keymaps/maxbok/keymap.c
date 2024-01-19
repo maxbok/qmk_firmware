@@ -59,9 +59,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 void eeconfig_init_user(void) {
-#ifdef RGB_MATRIX_ENABLE
-    rgb_matrix_enable_noeeprom();
-#endif
 }
 
 uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {

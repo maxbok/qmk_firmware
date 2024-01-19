@@ -57,10 +57,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     #undef ENABLE_RGB_MATRIX_SOLID_SPLASH
     // Enable effects
     #define ENABLE_RGB_MATRIX_SOLID_COLOR
-    // Default effect
-    #define RGB_MATRIX_STARTUP_MODE RGB_MATRIX_SOLID_COLOR
-    #define RGB_MATRIX_STARTUP_HUE 0
-    #define RGB_MATRIX_STARTUP_SAT 0
-    #define RGB_MATRIX_STARTUP_VAL 0
 #endif
 
