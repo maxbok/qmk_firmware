@@ -3,6 +3,7 @@
 #include "maxbok.h"
 
 void rgb_keyboard_init(void);
+void rgb_hid_unlock(void);
 
 typedef uint16_t COLOR_SYMBOL;
 

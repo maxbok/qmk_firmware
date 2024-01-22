@@ -29,6 +29,10 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     return state;
 }
 
+void rgb_hid_unlock(void) {
+    rgb_matrix_mode_noeeprom(RGB_MATRIX_CUSTOM_WAKEUP);
+}
+
 void suspend_power_down_keymap(void) {
     rgb_matrix_set_suspend_state(true);
 }

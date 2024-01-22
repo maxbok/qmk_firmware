@@ -3,6 +3,7 @@
 #include "transactions.h"
 #include "maxbok.h"
 #include "oled_assets.h"
+#include "rgb.h"
 
 typedef struct Report {
     uint8_t type;
@@ -384,6 +385,7 @@ void unlock(void) {
     
     is_locked.value = false;
     is_locked.changed = true;
+    rgb_hid_unlock();
 }
 
 void lock(void) {
