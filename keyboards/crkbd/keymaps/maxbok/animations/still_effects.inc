@@ -8,20 +8,18 @@ extern RGB symbol_to_rgb(uint16_t);
 
 // Still effect
 
-static bool still_effect(uint16_t layer, effect_params_t* params) {
+void turn_off_underglow(void) {
     RGB color = (RGB) { RGB_OFF };
-    rgb_matrix_set_color(0, color.r, color.g, color.b);
-    rgb_matrix_set_color(1, color.r, color.g, color.b);
-    rgb_matrix_set_color(2, color.r, color.g, color.b);
-    rgb_matrix_set_color(3, color.r, color.g, color.b);
-    rgb_matrix_set_color(4, color.r, color.g, color.b);
-    rgb_matrix_set_color(5, color.r, color.g, color.b);
-    rgb_matrix_set_color(27, color.r, color.g, color.b);
-    rgb_matrix_set_color(28, color.r, color.g, color.b);
-    rgb_matrix_set_color(29, color.r, color.g, color.b);
-    rgb_matrix_set_color(30, color.r, color.g, color.b);
-    rgb_matrix_set_color(31, color.r, color.g, color.b);
-    rgb_matrix_set_color(32, color.r, color.g, color.b);
+    for (uint8_t i = 0; i < 6; i++) {
+        rgb_matrix_set_color(i, color.r, color.g, color.b);
+    }
+    for (uint8_t i = 27; i < 33; i++) {
+        rgb_matrix_set_color(i, color.r, color.g, color.b);
+    }
+}
+
+static bool still_effect(uint16_t layer, effect_params_t* params) {
+    turn_off_underglow();
 
     RGB_MATRIX_USE_LIMITS(led_min, led_max);
 
@@ -29,7 +27,9 @@ static bool still_effect(uint16_t layer, effect_params_t* params) {
         for (int col = 0; col < MATRIX_COLS; col++) {
             uint8_t index = g_led_config.matrix_co[row][col];
 
-            if (index >= led_min && index < led_max && index != NO_LED) {
+            if (index >= led_min &&
+                index < led_max &&
+                HAS_ANY_FLAGS(g_led_config.flags[index], params->flags)) {
                 uint16_t symbol = color_symbols[layer][row][col];
                 RGB rgb = symbol_to_rgb(symbol);
                 rgb_matrix_set_color(index, rgb.r, rgb.g, rgb.b);
@@ -59,6 +59,5 @@ static bool NAV(effect_params_t* params) {
 static bool UTILS(effect_params_t* params) {
     return still_effect(_UTILS, params);
 }
-
 
 #endif

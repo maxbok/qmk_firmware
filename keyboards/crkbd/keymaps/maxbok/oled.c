@@ -101,11 +101,7 @@ void sync_is_locked(uint8_t in_buflen, const void* in_data, uint8_t out_buflen, 
     is_locked.changed = true;
 }
 
-void keyboard_post_init_user(void) {
-#ifdef RGB_MATRIX_ENABLE
-    rgb_matrix_enable_noeeprom();
-    rgb_matrix_mode_noeeprom(RGB_MATRIX_CUSTOM_QWERTY);
-#endif
+void oled_keyboard_init(void) {
     transaction_register_rpc(SYNC_HOST_NAME, sync_host_name);
     transaction_register_rpc(SYNC_DATE, sync_date);
     transaction_register_rpc(SYNC_IS_LOCKED, sync_is_locked);

@@ -17,6 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "maxbok.h"
+#include "rgb.h"
+#include "oled.h"
 #include "tap_dance.h"
 
 #define SLSH_LM LT(_NAV, KC_SLSH)
@@ -58,7 +60,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     )
 };
 
-void eeconfig_init_user(void) {
+void keyboard_post_init_user(void) {
+    rgb_keyboard_init();
+    oled_keyboard_init();
 }
 
 uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
