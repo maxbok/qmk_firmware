@@ -46,6 +46,7 @@ void suspend_wakeup_init_keymap(void) {
 #define NUM 10
 #define SYM 20 // Symbol
 #define NAV 30
+#define MED 35 // Media
 #define MOU 40
 #define UTL 50 // To utils
 #define QBT 100 // Boot
@@ -53,17 +54,18 @@ void suspend_wakeup_init_keymap(void) {
 
 #define COLOR_WHITE         (RGB){ .r = 255, .g = 255, .b = 255 } 
 #define COLOR_GRAY          (RGB){ .r = 150, .g = 150, .b = 150 } 
-#define COLOR_LIGHT_PURPLE  (RGB){ .r = 147, .g = 112, .b = 219 } 
-#define COLOR_DARK_PURPLE   (RGB){ .r = 73,  .g = 56,  .b = 109 } 
+#define COLOR_DARK_GRAY     (RGB){ .r = 20,  .g = 20,  .b = 20  } 
+#define COLOR_LIGHT_PURPLE  (RGB){ .r = 91 , .g = 46,  .b = 183 } 
+#define COLOR_DARK_PURPLE   (RGB){ .r = 30,  .g = 15,  .b = 61  } 
 
 #define COLOR_ORANGE        (RGB){ .r = 255, .g = 192, .b = 0   }
 #define COLOR_DARK_ORANGE   (RGB){ .r = 255, .g = 80,  .b = 0   }
 
-#define COLOR_RED           (RGB){ .r = 255, .g = 0,   .b = 0   }
-#define COLOR_LIGHT_RED     (RGB){ .r = 255, .g = 25,  .b = 25  }
+#define COLOR_RED           (RGB){ .r = 176, .g = 3,   .b = 3   }
+#define COLOR_LIGHT_RED     (RGB){ .r = 250, .g = 25,  .b = 25  }
 
-#define COLOR_LIGHT_BLUE    (RGB){ .r = 35,  .g = 65,  .b = 200 }
-#define COLOR_BLUE          (RGB){ .r = 20,  .g = 30,  .b = 255 }
+#define COLOR_LIGHT_BLUE    (RGB){ .r = 91,  .g = 174, .b = 190 }
+#define COLOR_BLUE          (RGB){ .r = 7,   .g = 16,  .b = 18  }
 
 
 RGB symbol_to_rgb(COLOR_SYMBOL symbol) {
@@ -75,10 +77,11 @@ RGB symbol_to_rgb(COLOR_SYMBOL symbol) {
         case DPL:   return COLOR_DARK_PURPLE;
 
         case NUM:   return COLOR_DARK_PURPLE;
-        case SYM:   return COLOR_LIGHT_PURPLE;
+        case SYM:   return COLOR_DARK_GRAY;
         case NAV:   return COLOR_BLUE;
-        case MOU:   return COLOR_LIGHT_BLUE;
-        case UTL:   return COLOR_LIGHT_RED;
+        case MED:   return COLOR_DARK_GRAY;
+        case MOU:   return COLOR_BLUE;
+        case UTL:   return COLOR_LIGHT_BLUE;
         case QBT:   return COLOR_RED;
 
         default:    return (RGB) { RGB_OFF };
@@ -101,11 +104,11 @@ const uint16_t color_symbols[4][MATRIX_ROWS][MATRIX_COLS] = {
     [_SYMBOLS] = LAYOUT_split_3x6_3(
         ___, SYM, SYM, SYM, SYM, SYM,               SYM, SYM, SYM, SYM, SYM, ___,
         ___, NUM, NUM, NUM, NUM, NUM,               NUM, NUM, NUM, NUM, NUM, ___,
-        ___, UTL, SYM, SYM, SYM, SYM,               ___, ___, ___, ___, UTL, ___,
+        ___, UTL, SYM, SYM, SYM, SYM,               SYM, SYM, SYM, SYM, UTL, ___,
                             ___, ___, ___,     ___, ___, ___
     ),
     [_NAV] = LAYOUT_split_3x6_3(
-        ___, ___, ___, MOU, ___, ___,               ___, ___, ___, ___, ___, ___,
+        ___, MED, MED, MOU, MED, MED,               ___, MED, MED, MED, ___, ___,
         ___, ___, MOU, MOU, MOU, ___,               NAV, NAV, NAV, NAV, ___, ___,
         ___, ___, ___, MOU, ___, ___,               ___, ___, ___, ___, ___, ___,
                             ___, ___, ___,     ___, ___, ___
