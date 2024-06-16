@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define SFT_DEL RSFT_T(KC_DEL)
 #define SPC_SYM LT(_SYMBOLS, KC_SPC)
 #define MO_SYM  MO(_SYMBOLS)
-#define TG_UTIL TG(_UTILS)
+#define TO_UTIL OSL(_UTILS)
 
 #define PRV_TAB SCMD(KC_LCBR)
 #define NXT_TAB SCMD(KC_RCBR)
@@ -42,7 +42,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_SYMBOLS] = LAYOUT_split_3x6_3(
         KC_GRV,  KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC,                     KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, _______,
         _______, KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                        KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_BSLS,
-        _______, TG_UTIL, KC_SCLN, KC_COLN, KC_MINS, KC_EQL,                      KC_LCBR, KC_LBRC, KC_RBRC, KC_RCBR, TG_UTIL, _______,
+        _______, TO_UTIL, KC_SCLN, KC_COLN, KC_MINS, KC_EQL,                      KC_LCBR, KC_LBRC, KC_RBRC, KC_RCBR, TO_UTIL, _______,
                                             _______, _______, _______,   _______, _______, _______
     ),
     [_NAV] = LAYOUT_split_3x6_3(
