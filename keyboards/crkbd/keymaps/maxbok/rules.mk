@@ -1,6 +1,5 @@
 CONVERT_TO = elite_pi
 RAW_ENABLE = yes
-TAP_DANCE_ENABLE = yes
 
 BACKLIGHT_ENABLE = no
 RGBLIGHT_ENABLE = no
@@ -15,4 +14,3 @@ ifeq ($(strip $(OLED_ENABLE)), yes)
 	SRC += oled.c
 endif
 
-SRC += tap_dance.c
