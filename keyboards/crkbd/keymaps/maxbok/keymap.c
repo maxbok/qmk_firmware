@@ -79,11 +79,21 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
     }
 }
 
+bool get_permissive_hold(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case SLSH_LM:
+        case CTL_TAB:
+        case SFT_DEL:
+            return true;
+        default:
+            return false;
+    }
+}
+
 uint16_t get_quick_tap_term(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case SLSH_LM:
         case SFT_DEL:
-        case SPC_SYM:
             return 0;
         default:
             return get_tapping_term(keycode, record);

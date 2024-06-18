@@ -29,7 +29,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define TAPPING_TERM 200
 #define TAPPING_TERM_PER_KEY
 
+#define PERMISSIVE_HOLD_PER_KEY
 #define PERMISSIVE_HOLD
+
 #define QUICK_TAP_TERM_PER_KEY
 
 #define SPLIT_LAYER_STATE_ENABLE
